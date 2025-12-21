@@ -49,6 +49,13 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
       }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+      }
     </style>
   <script type="importmap">
 {
@@ -64,5 +71,7 @@
 </head>
   <body class="bg-brand-900 text-slate-100 font-sans antialiased selection:bg-brand-gold selection:text-white">
     <div id="root"></div>
+    <!-- Entry point for the React application -->
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>

@@ -2,23 +2,20 @@ import { GoogleGenAI } from "@google/genai";
 
 const API_KEY = process.env.API_KEY || '';
 
-// Initialize Gemini Client
-// Note: In a real production app, you might proxy this through a backend to hide the key,
-// but for this client-side demo, we use the env var directly as per instructions.
+// Initialize Gemini Client with mandatory named parameter
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const SYSTEM_INSTRUCTION = `
-You are the "WPC Legal Assistant", an AI intake specialist for Western Pacific Counsel, a California law firm serving the Inland Empire, LA, and Orange County. 
+You are the "WPC Legal Assistant", an expert AI intake specialist for Western Pacific Counsel, a premier California law firm. 
 
-Your role is to:
-1. Briefly greet the user and ask how you can help with their legal inquiry.
-2. Collect basic information about their legal issue (e.g., type of case, location, timeline) in a conversational manner.
-3. Provide general information about common legal topics (Personal Injury, Estate Planning, Business Law) if asked.
-4. IMPORTANT: You are NOT a lawyer. You cannot give legal advice. You must explicitly state this if the user asks for specific legal strategy or outcomes.
-5. Keep responses professional, concise, and empathetic.
-6. If the user seems ready to proceed, encourage them to fill out the contact form or call the office.
+Your goals:
+1. Briefly greet the user.
+2. Conversational Intake: Gather key details about their legal matter (What happened? When? Where? Who is involved?).
+3. Scope: We handle Personal Injury, Employment Law, Estate Planning, and Business Litigation in Southern California (IE, LA, OC).
+4. Disclaimer: You are NOT an attorney and cannot provide legal advice.
+5. Action: If the user describes a potential case, suggest transferring the details to our secure contact form for attorney review.
 
-Tone: Professional, modern, calm, and authoritative yet accessible.
+Professional, empathetic, and concise. Avoid long paragraphs.
 `;
 
 export const streamChatResponse = async (
@@ -33,7 +30,7 @@ export const streamChatResponse = async (
 
   try {
     const chat = ai.chats.create({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         temperature: 0.7,
@@ -62,15 +59,20 @@ export const summarizeChat = async (history: { role: string; text: string }[]) =
 
   try {
     const conversation = history.map(m => `${m.role === 'model' ? 'Assistant' : 'User'}: ${m.text}`).join('\n');
-    const prompt = `Please summarize the following conversation between a legal assistant AI and a potential client. 
-    Focus on the user's legal issue, location, and any specific details provided. 
-    Format it as a concise note for an attorney to review before contacting the client.
+    const prompt = `Based on the following intake conversation, provide a structured summary for a law firm partner. 
+    Include:
+    - Primary Legal Issue
+    - Incident Date/Location (if mentioned)
+    - Key Facts
+    - User's Desired Outcome
+    
+    Format as a clean, professional report.
     
     Conversation:
     ${conversation}`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
     });
     
